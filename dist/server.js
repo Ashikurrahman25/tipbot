@@ -160,7 +160,7 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             result = {
                 success: true,
                 message: `Successfully sent ${tkn === 'near' ? 'NEAR' : tkn} tokens!`,
-                txnLink: `https://nearblocks.io/txns/${functionCallResult.transaction_outcome.id}`,
+                txnLink: `${functionCallResult.transaction_outcome.id}`,
                 gasUsed: functionCallResult.transaction_outcome.outcome.gas_burnt.toString(),
                 gasFee: gasFeeNEAR.toFixed(8), // Corrected calculation
                 transactionFee: transactionFeeNEAR.toFixed(8)
