@@ -50,7 +50,7 @@ const setup = async () => {
   await myKeyStore.setKey('testnet', 'dragontip.testnet', keyPair);
   
   const near = await connect(
-    testConfig
+    mainConfig
   );
 
 
