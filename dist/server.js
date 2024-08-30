@@ -72,17 +72,17 @@ let contract;
 let account;
 const setup = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("setup");
-    const PRIVATE_KEY = "ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
+    const PRIVATE_KEY = "ed25519:5ZvvrgTNgqbZoxfq7hzWoS31KrCjvujUEkzQoprRFxg5k9xDtB3Qn3q1XAdELqdNVgtxMDiDaA36gWVj7YH7UTSt"; //"ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
     const keyPair = near_api_js_1.KeyPair.fromString(PRIVATE_KEY);
-    yield myKeyStore.setKey('testnet', 'dragontip.testnet', keyPair);
-    const near = yield connect(testConfig);
-    account = yield near.account("dragontip.testnet");
+    yield myKeyStore.setKey('mainnet', 'dragontip.near', keyPair);
+    const near = yield connect(mainConfig);
+    account = yield near.account("dragontip.near");
     const methodOptions = {
         viewMethods: ['ft_balance_of'],
         changeMethods: [`ft_transfer`, 'send_ft_to_user'],
         useLocalViewExecution: true
     };
-    contract = new Contract(account, "dragontip.testnet", methodOptions);
+    contract = new Contract(account, "dragontip.near", methodOptions);
     console.log("Setup Done");
 });
 setup();
