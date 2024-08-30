@@ -45,23 +45,23 @@ let account: nearAPI.Account;
 const setup = async () => {
 
   console.log("setup");
-  const PRIVATE_KEY = "ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
+  const PRIVATE_KEY = "ed25519:5ZvvrgTNgqbZoxfq7hzWoS31KrCjvujUEkzQoprRFxg5k9xDtB3Qn3q1XAdELqdNVgtxMDiDaA36gWVj7YH7UTSt";     //"ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
   const keyPair = KeyPair.fromString(PRIVATE_KEY);
-  await myKeyStore.setKey('testnet', 'dragontip.testnet', keyPair);
+  await myKeyStore.setKey('mainnet', 'dragontip.near', keyPair);
   
   const near = await connect(
     mainConfig
   );
 
 
-  account = await near.account("dragontip.testnet");
+  account = await near.account("dragontip.near");
   const methodOptions = {
     viewMethods: ['ft_balance_of'],
     changeMethods: [`ft_transfer`,'send_ft_to_user'],
     useLocalViewExecution: true 
   };
 
-  contract = new Contract(account,"dragontip.testnet",
+  contract = new Contract(account,"dragontip.near",
   methodOptions
 );
 console.log("Setup Done");
