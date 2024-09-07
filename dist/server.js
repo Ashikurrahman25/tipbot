@@ -45,6 +45,13 @@ const near_api_js_1 = require("near-api-js");
 const { keyStores } = nearAPI;
 const { Contract } = nearAPI;
 const myKeyStore = new keyStores.InMemoryKeyStore();
+const crypto = __importStar(require("crypto"));
+const passphrase = process.env.PASS_PHRASE; // Replace with your secure passphrase
+const salt = process.env.SALT; // Replace with a secure, consistent salt
+const keyLength = 32; // AES-256 requires a 32-byte key
+const iterations = 100000; // Number of iterations for PBKDF2
+const digest = 'sha256'; //
+const private_key = process.env.PRIVATE_KEY;
 // {"publicKey":"ed25519:49c621YSa97t7Y8LePjKeKVPLD41RnZ2oKCFZS4StQo2","secretKey":"ed25519:JuhY65DQPQUHdVwJMQhXUayVxRtXx4NtcM296aeCAUkRTKAWxwKS2XfBdZGZHXN8T9K3fak55fvkG6bu63uQ3WY"}
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
@@ -72,7 +79,7 @@ let contract;
 let account;
 const setup = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("setup");
-    const PRIVATE_KEY = "ed25519:5ZvvrgTNgqbZoxfq7hzWoS31KrCjvujUEkzQoprRFxg5k9xDtB3Qn3q1XAdELqdNVgtxMDiDaA36gWVj7YH7UTSt"; //"ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
+    const PRIVATE_KEY = decodePrivateKey(private_key); //"ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
     const keyPair = near_api_js_1.KeyPair.fromString(PRIVATE_KEY);
     yield myKeyStore.setKey('mainnet', 'dragontip.near', keyPair);
     const near = yield connect(mainConfig);
@@ -182,6 +189,29 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ error: error.message });
     }
 }));
+function deriveKey() {
+    return crypto.pbkdf2Sync(passphrase, salt, iterations, keyLength, digest);
+}
+function decodePrivateKey(encryptedData) {
+    try {
+        const [ivHex, encrypted, authTagHex] = encryptedData.split(':');
+        if (!ivHex || !encrypted || !authTagHex) {
+            throw new Error('Invalid format: Missing IV, encrypted data, or auth tag');
+        }
+        const iv = Buffer.from(ivHex, 'hex');
+        const authTag = Buffer.from(authTagHex, 'hex');
+        const key = deriveKey(); // Derive the decryption key from the passphrase and salt
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+        decipher.setAuthTag(authTag); // Set the authentication tag
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    }
+    catch (error) {
+        console.error('Error during decryption:', error.message);
+        throw new Error('Failed to decode the key. Please ensure the format is correct and the passphrase and salt are consistent.');
+    }
+}
 const port = process.env.PORT || 9000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
