@@ -113,7 +113,7 @@ console.log("Setup Done");
 
     } else {
       // Handle custom token transfer using ft_transfer
-      const amountConverted = amount; // Assuming the token uses 8 decimals
+      const amountConverted = Number(amount); // Assuming the token uses 8 decimals
       console.log(`Converted Amount (for token transfer): ${amountConverted}`);
 
       functionCallResult = await account.functionCall({
