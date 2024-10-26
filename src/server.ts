@@ -88,6 +88,7 @@ console.log("Setup Done");
       return res.status(400).json({ error: 'Missing "receiver_id", "amount", or "tkn" in the request body.' });
     }
 
+
     let functionCallResult;
     let gasFeeNEAR = 0;
     let transactionFeeNEAR = 0;
@@ -112,7 +113,7 @@ console.log("Setup Done");
 
     } else {
       // Handle custom token transfer using ft_transfer
-      const amountConverted = (parseFloat(amount) * Math.pow(10, 8)).toString(); // Assuming the token uses 8 decimals
+      const amountConverted = amount; // Assuming the token uses 8 decimals
       console.log(`Converted Amount (for token transfer): ${amountConverted}`);
 
       functionCallResult = await account.functionCall({
