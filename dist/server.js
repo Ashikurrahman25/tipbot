@@ -107,18 +107,13 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             // Handle NEAR transfer
             const amountConverted = BigInt(parseFloat(amount) * Math.pow(10, 24));
             console.log(`Converted Amount (in yoctoNEAR): ${amountConverted}`);
-            // Send NEAR tokens
             functionCallResult = yield account.sendMoney(receiver_id, amountConverted);
-            // Extract gas used and calculate the gas fee
             const gasUsed = BigInt(functionCallResult.transaction_outcome.outcome.gas_burnt);
-            const gasFeeYoctoNEAR = parseFloat(gasUsed.toString()) * 1e-12; // Convert gas used to NEAR
-            // Extract transaction fee (total tokens burnt)
+            const gasFeeYoctoNEAR = parseFloat(gasUsed.toString()) * 1e-12;
             let totalTokensBurnt = BigInt(functionCallResult.transaction_outcome.outcome.tokens_burnt);
-            // Add up tokens burnt from the receipts outcomes
             functionCallResult.receipts_outcome.forEach(outcome => {
                 totalTokensBurnt += BigInt(outcome.outcome.tokens_burnt);
             });
-            // Convert the total fee from yoctoNEAR to NEAR
             gasFeeNEAR = gasFeeYoctoNEAR;
             transactionFeeNEAR = parseFloat(totalTokensBurnt.toString()) / Math.pow(10, 24);
         }
@@ -127,7 +122,7 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const amountConverted = (parseFloat(amount) * Math.pow(10, 8)).toString(); // Assuming the token uses 8 decimals
             console.log(`Converted Amount (for token transfer): ${amountConverted}`);
             functionCallResult = yield account.functionCall({
-                contractId: tkn, // Token contract ID
+                contractId: "blackdragon.tkn.near", // Token contract ID
                 methodName: 'ft_transfer',
                 args: {
                     receiver_id,
@@ -136,7 +131,6 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
                 attachedDeposit: BigInt(1) // Typically a small attached deposit is required
             });
-            // Similar process for calculating gas and transaction fees
             const gasUsed = BigInt(functionCallResult.transaction_outcome.outcome.gas_burnt);
             const gasFeeYoctoNEAR = parseFloat(gasUsed.toString()) * 1e-12;
             let totalTokensBurnt = BigInt(functionCallResult.transaction_outcome.outcome.tokens_burnt);
