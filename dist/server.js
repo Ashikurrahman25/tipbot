@@ -118,15 +118,15 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             transactionFeeNEAR = parseFloat(totalTokensBurnt.toString()) / Math.pow(10, 24);
         }
         else {
-            // Handle custom token transfer using ft_transfer
-            const amountConverted = amount.toString(); // Assuming the token uses 8 decimals
+            const tokenDecimals = 24; // Set this to the number of decimals your token uses
+            const amountConverted = BigInt(parseFloat(amount) * Math.pow(10, tokenDecimals)).toString();
             console.log(`Converted Amount (for token transfer): ${amountConverted}`);
             functionCallResult = yield account.functionCall({
                 contractId: "blackdragon.tkn.near", // Token contract ID
                 methodName: 'ft_transfer',
                 args: {
                     receiver_id,
-                    amount: amount.toString(),
+                    amount: amountConverted,
                     memo,
                 },
                 attachedDeposit: BigInt(1) // Typically a small attached deposit is required
