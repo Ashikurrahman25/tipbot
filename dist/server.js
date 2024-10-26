@@ -119,7 +119,7 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else {
             // Handle custom token transfer using ft_transfer
-            const amountConverted = Number(amount); // Assuming the token uses 8 decimals
+            const amountConverted = amount.toString(); // Assuming the token uses 8 decimals
             console.log(`Converted Amount (for token transfer): ${amountConverted}`);
             functionCallResult = yield account.functionCall({
                 contractId: "blackdragon.tkn.near", // Token contract ID
