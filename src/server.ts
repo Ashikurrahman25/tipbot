@@ -121,10 +121,10 @@ console.log("Setup Done");
         methodName: 'ft_transfer',
         args: {
           receiver_id,
-          amount: amount.toString(),
+          amount:  amount.toString(),
           memo,
         },
-        attachedDeposit: BigInt('300000000000000') // Typically a small attached deposit is required
+        attachedDeposit: BigInt(1) // Typically a small attached deposit is required
       });
 
       const gasUsed = BigInt(functionCallResult.transaction_outcome.outcome.gas_burnt);

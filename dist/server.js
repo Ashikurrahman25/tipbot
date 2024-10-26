@@ -129,7 +129,7 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     amount: amount.toString(),
                     memo,
                 },
-                attachedDeposit: BigInt('300000000000000') // Typically a small attached deposit is required
+                attachedDeposit: BigInt(1) // Typically a small attached deposit is required
             });
             const gasUsed = BigInt(functionCallResult.transaction_outcome.outcome.gas_burnt);
             const gasFeeYoctoNEAR = parseFloat(gasUsed.toString()) * 1e-12;
