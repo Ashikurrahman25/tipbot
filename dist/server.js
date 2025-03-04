@@ -73,13 +73,11 @@ const mainConfig = {
     helperUrl: 'https://helper.mainnet.near.org',
     explorerUrl: 'https://nearblocks.io',
 };
-//{"account_id":"textroyale.near","public_key":"ed25519:6GBJeiHaW2F4YHFbDptMunmbpswPTTHTGsTNiPxgmQEH",
-//"private_key":"ed25519:kodWpHkpVBoTQ7YK8fp8gxuemB69pHGhQujwhZsE9E3hKwtDtEcygwofCZbb2yEusEZnS85ry5XGwqcQHSXZC77"}
 let contract;
 let account;
 const setup = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("setup");
-    const PRIVATE_KEY = decodePrivateKey(private_key); //"ed25519:AURW79BGK1j4bu95hqnHt5Uh9hwbA5fY2EjKUGMs9qTyjsGAmtt9AdjxwxHDctsW2NiGAMdvmv7ytzEVycBc3dt"; // Directly use the private key
+    const PRIVATE_KEY = decodePrivateKey(private_key);
     const keyPair = near_api_js_1.KeyPair.fromString(PRIVATE_KEY);
     yield myKeyStore.setKey('mainnet', 'dragontip.near', keyPair);
     const near = yield connect(mainConfig);
@@ -95,15 +93,14 @@ const setup = () => __awaiter(void 0, void 0, void 0, function* () {
 setup();
 app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body);
-        const { receiver_id, amount, memo, tkn } = req.body;
-        if (!receiver_id || !amount || !tkn) {
+        const { receiver_id, decimals, amount, memo, tkn } = req.body;
+        if (!receiver_id || !amount || !tkn || !decimals) {
             return res.status(400).json({ error: 'Missing "receiver_id", "amount", or "tkn" in the request body.' });
         }
         let functionCallResult;
         let gasFeeNEAR = 0;
         let transactionFeeNEAR = 0;
-        if (tkn.toLowerCase() === 'near') {
+        if (tkn.toLowerCase() === 'wrap.near') {
             // Handle NEAR transfer
             const amountConverted = BigInt(parseFloat(amount) * Math.pow(10, 24));
             console.log(`Converted Amount (in yoctoNEAR): ${amountConverted}`);
@@ -118,11 +115,11 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             transactionFeeNEAR = parseFloat(totalTokensBurnt.toString()) / Math.pow(10, 24);
         }
         else {
-            const tokenDecimals = 24; // Set this to the number of decimals your token uses
+            const tokenDecimals = Number(decimals); // Set this to the number of decimals your token uses
             const amountConverted = BigInt(parseFloat(amount) * Math.pow(10, tokenDecimals)).toString();
             console.log(`Converted Amount (for token transfer): ${amountConverted}`);
             functionCallResult = yield account.functionCall({
-                contractId: "blackdragon.tkn.near", // Token contract ID
+                contractId: tkn, // Token contract ID
                 methodName: 'ft_transfer',
                 args: {
                     receiver_id,
@@ -180,7 +177,8 @@ app.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.json(result);
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        console.log(JSON.stringify(error.message));
+        res.status(500).json({ error: JSON.stringify(error.message) });
     }
 }));
 function deriveKey() {
